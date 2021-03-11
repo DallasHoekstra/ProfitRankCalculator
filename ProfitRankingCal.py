@@ -7,16 +7,15 @@ import re
 
 #Add import multiprocessing and multiprocessing code to call and process multiple websites simultaneously
 
-invalidfilecharacters = ['\\', '\/', '\:', '\*', '\?', '\"', '\<', '\>', '\|', '\-']
-
-print("The script has the name %s " % sys.argv[0])
-# print("The website provided was %s" % sys.argv[1])
-# webpage = requests.get(sys.argv[1])
+#invalidfilecharacters = ['\\', '\/', '\:', '\*', '\?', '\"', '\<', '\>', '\|', '\-']
 
 percentagePage = requests.get('https://www.advancedwebranking.com/ctrstudy')
+print(percentagePage)
 parsedwebpage = BeautifulSoup(percentagePage.content, 'html.parser')
+print(parsedwebpage)
 rankColumns = parsedwebpage.find_all('g', class_="amcharts-graph-column") #, aria-label=True
 
+print("lalalalalal")
 for column in rankColumns:
     print(column)
 
