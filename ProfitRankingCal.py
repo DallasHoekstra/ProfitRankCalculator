@@ -51,6 +51,7 @@ def collateData(numFiles):
         with open(filename) as json_file:
             data = json.load(json_file)
             keywordTraffic[data['keyword']] = data['keywordVolumeByRank']
+        os.remove(filename)
         #             print(sourceFiles)
         # print(len(sourceFiles))
     exportCollatedData(keywordTraffic)
