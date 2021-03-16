@@ -1,20 +1,25 @@
+downloaded = false
+
 MutationObserver = window.MutationObserver || window.WebKitMutationObserver;
 
 var observer = new MutationObserver(function(mutations, observer) {
+    
     keywordVolumeByRank = clicksAtRank();
     keyword = retrieveKeywords();
-    if (keywordVolumeByRank && keyword) {
-        // localStorage.setItem(keyword, keywordVolumeByRank);
-        dataObject = {
-            "keyword": keyword,
-            "keywordVolumeByRank": keywordVolumeByRank
-        };
-        // prepend filename with KWP- to separate from other files for easy automated processing
-        filename = "KWP-" + keyword;
+    if (downloaded == false) {    
+        if (keywordVolumeByRank && keyword) {
+            
+            dataObject = {
+                "keyword": keyword,
+                "keywordVolumeByRank": keywordVolumeByRank
+            };
+            // prepend filename with KWP- to separate from other files for easy automated processing
+            filename = "KWP-" + keyword;
+            downloaded = true
+            downloadKeywordAndRankData(dataObject, filename);
 
-        downloadKeywordAndRankData(dataObject, filename);
+        }
     }
-
 });
 
 observer.observe(document, {
