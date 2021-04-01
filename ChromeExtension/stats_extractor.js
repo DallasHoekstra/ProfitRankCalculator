@@ -29,9 +29,7 @@ observer.observe(document, {
 
 function retrieveKeywords() {
     keywordTag = document.getElementsByTagName("input")[0];
-    if (keywordTag.value !== '') {
-        return keywordTag.value;
-    } 
+    return keywordTag.value;
 }
 
 function clicksAtRank() {

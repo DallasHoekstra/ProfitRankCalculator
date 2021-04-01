@@ -77,7 +77,7 @@ def exportCollatedData(keywordTraffic):
         if path.exists(exportFile):
             os.remove(exportFile)
 
-        with open(exportFile, 'w') as outfile:
+        with open(exportFile, 'w', newline='', encoding='utf-8') as outfile:
             csv_writer = csv.writer(outfile)
             headersWritten = False
 
@@ -88,8 +88,8 @@ def exportCollatedData(keywordTraffic):
                     csv_writer.writerow(header)
                     headersWritten = True
                 row = [keyword]
-                for rank in keywordTraffic[keyword]:
-                    row.append(rank)
+                for rank in keywordTraffic[keyword]:                    
+                    row.append(rank)                
                 csv_writer.writerow(row)
 
 
