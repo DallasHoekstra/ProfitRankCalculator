@@ -6,19 +6,18 @@ import json
 import csv
 import webbrowser
 import urllib.parse
+import config
 
-# Reconfigure these paths for deployment
-pathToDownloads = "C:\\Users\\Dallas H\\Downloads"
-exportPath = "C:\\Users\\Dallas H\\Downloads"
-exportFilename = {'json':'\\collatedData.json', 'csv':'\\collatedData.csv'}
-keywordList = "C:\\Users\\Dallas H\\Desktop\\Dev\\ProfitRankCalculator\\keyword_list.json"
+pathToDownloads = config.parameters['pathToDownloads']
+exportPath = config.parameters['exportPath']
+exportFilename = config.parameters['exportFilename']
+keywordList = config.parameters['keywordList']
+export_to_json = config.parameters['export_to_json']
+export_to_csv = config.parameters['export_to_csv']
+base_url = config.parameters['base_url']
+debug = config.parameters['debug']
 
-export_to_json = False
-export_to_csv = True
 
-base_url = "https://www.google.com/search?q="
-
-debug = False
 # extract the list of comma separated keywords to collect data on.
 # If I switch to a GUI input system I may need to change the parse method.
 def parseKeywordList():
