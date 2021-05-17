@@ -2,82 +2,79 @@
 import sys
 import os
 from os import path
-# import requests
-# from bs4 import BeautifulSoup
 import time
-# import requests
 import json
 import csv
 import webbrowser
 import urllib.parse
-import threading
 
-pathToDownloads = "C:\\Users\\Dallas H\\Downloads"
-exportPath = "C:\\Users\\Dallas H\\Downloads"
-exportFilename = '\\collatedData.json'
-keywordList = "C:\\Users\\Dallas H\\Downloads\\keywordList.txt"
+debug = False
 
+pathToDownloads = "/home/server/Downloads/"
+exportPath = "/home/server/Desktop/ProfRankCalc/ProfitRankCalculator/"
+exportFilename = {'json':'/collatedData.json', 'csv':'/collatedData.csv'}
+keywordList = "/home/server/Desktop/ProfRankCalc/ProfitRankCalculator/keyword_list.json"
 export_to_json = False
 export_to_csv = True
+base_url ="https://www.google.com/search?q="
 
 # extract the list of comma separated keywords to collect data on.
 # If I switch to a GUI input system I may need to change the parse method.
 def parseKeywordList():
-    with open(keywordList) as keywordFile:
-        keywordString = ''.join(keywordFile.readlines())
-        keywords = keywordString.split('.')[1]
-        splitKeywords = keywords.split(',')
-        return splitKeywords
+    if (debug):
+        os.system("python3 json_creator.py")
+    data = {}
+    with open(keywordList) as keyword_file_json:
+        data = json.load(keyword_file_json)
+        for key in data:
+            data[key] = base_url + urllib.parse.quote(key)
+    os.remove(keywordList)
+    return data
 
 def autoSearchKeywords(keywords):
-    chromePath = "C:\\Program Files(x86)\\Google\\Chrome\\Application\\chrome.exe"
+    chromePath = "/usr/bin/google-chrome"
     webbrowser.register('chrome', None, webbrowser.BackgroundBrowser(chromePath))
-    base_url = "https://www.google.com/search?q="
-    if type(keywords) is list:
-        for keyword in keywords:
-            query = urllib.parse.quote(keyword)
-            webbrowser.open(base_url + query, 2)
-    elif type(keywords) is str:
-        query = urllib.parse.quote(keywords)
-        webbrowser.open(base_url + query, 2)
+    for key in keywords:
+        print(f'Key: {key}, Value: {keywords[key]}')
+        webbrowser.open(keywords[key], 2)
 
 def collateData(numFiles):
     keywordTraffic = {}
     sourceFiles = []
+    # Await completion of file downloads
     while (len(sourceFiles) < numFiles):
         sourceFiles = [filename for filename in os.listdir(pathToDownloads) if (filename.startswith("KWP-") & filename.endswith(".json"))]
         time.sleep(2)
+    # All files have been downloaded, create list of full path names
     for filename in sourceFiles:
-        sourceFiles[sourceFiles.index(filename)] = pathToDownloads + "\\" + filename    
+        sourceFiles[sourceFiles.index(filename)] = pathToDownloads + filename    
         print(f'filename {filename}')
+    # Extract data from files
     for filename in sourceFiles:
         print(f'opening {filename}')
         with open(filename) as json_file:
             data = json.load(json_file)
+            print(f'Data: {data}')
             keywordTraffic[data['keyword']] = data['keywordVolumeByRank']    
         os.remove(filename)
-        #             print(sourceFiles)
-        # print(len(sourceFiles))
-    exportCollatedData(keywordTraffic)
+    return keywordTraffic
 
 def exportCollatedData(keywordTraffic):
-    exportFile = exportPath + exportFilename
+    for key in exportFilename:
+        exportFilename[key] = exportPath + exportFilename[key]
 
-    
     if (export_to_json):
-        if path.exists(exportFile):
-            os.remove(exportFile)
+        if path.exists(exportFilename['json']):
+            os.remove(exportFilename['json'])
 
-        with open(exportFile, 'w') as outfile:
+        with open(exportFilename['json'], 'w') as outfile:
             json.dump(keywordTraffic, outfile)
+
     elif (export_to_csv):
-        exportFile = exportFile.split('.')[0]
-        exportFile = exportFile + ".csv"
+        if path.exists(exportFilename['csv']):
+            os.remove(exportFilename['csv'])
 
-        if path.exists(exportFile):
-            os.remove(exportFile)
-
-        with open(exportFile, 'w', newline='', encoding='utf-8') as outfile:
+        with open(exportFilename['csv'], 'w', newline='', encoding='utf-8') as outfile:
             csv_writer = csv.writer(outfile)
             headersWritten = False
 
@@ -100,8 +97,11 @@ def main():
     autoSearchKeywords(keywordsToSearch)
 
     # Collate the data into a single json file    
-    collateData(len(keywordsToSearch))
-    
+    cdata = collateData(len(keywordsToSearch))
+    exportCollatedData(cdata)
 
 
 main()
+
+#if __name__ = '__main__':
+#    main()
