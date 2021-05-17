@@ -18,7 +18,7 @@ export_to_csv = True
 
 base_url = "https://www.google.com/search?q="
 
-debug = True
+debug = False
 # extract the list of comma separated keywords to collect data on.
 # If I switch to a GUI input system I may need to change the parse method.
 def parseKeywordList():
@@ -48,12 +48,14 @@ def collateData(numFiles):
         time.sleep(2)
     # All files have been downloaded, create list of full path names
     for filename in sourceFiles:
-        sourceFiles[sourceFiles.index(filename)] = pathToDownloads + "\\" + filename    
-        print(f'filename {filename}')
+        sourceFiles[sourceFiles.index(filename)] = pathToDownloads + "\\" + filename 
+        if (debug):   
+            print(f'filename {filename}')
 
     # Extract data from files
     for filename in sourceFiles:
-        print(f'opening {filename}')
+        if (debug):
+            print(f'opening {filename}')
         with open(filename) as json_file:
             data = json.load(json_file)
             keywordTraffic[data['keyword']] = data['keywordVolumeByRank']    
