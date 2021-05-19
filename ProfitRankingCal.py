@@ -18,6 +18,8 @@ base_url = config.parameters['base_url']
 debug = config.parameters['debug']
 generate_json_command = config.parameters['generate_json_command']
 
+MAX_TABS = 10
+
 # extract the list of comma separated keywords to collect data on.
 # If I switch to a GUI input system I may need to change the parse method.
 def parseKeywordList():
@@ -32,9 +34,19 @@ def parseKeywordList():
     os.remove(keywordList)
     return data
 
+def batchSearches(keywordsToSearch, MAX_TABS):
+    searchSubset = {}
+    keylist = list(keywordsToSearch.keys())
+    while len(searchSubset) < MAX_TABS:
+        key = keylist.pop()
+        searchSubset[key] = keywordsToSearch.pop(key)
+    return searchSubset
+
+
 def autoSearchKeywords(keywords):
     chromePath = "/usr/bin/google-chrome"
     webbrowser.register('chrome', None, webbrowser.BackgroundBrowser(chromePath))
+
     for key in keywords:
         webbrowser.open(keywords[key], 2)
 
@@ -63,25 +75,24 @@ def collateData(numFiles):
         os.remove(filename)
     return keywordTraffic
 
+# FOR FUTURE: add a nonce to export file (and any other generated/removed files) 
+# so that simultaneous requests don't remove each others files.
+def delete_previous_searches():
+    if path.exists(exportFilename['json']):
+        os.remove(exportFilename['json'])
+    if path.exists(exportFilename['csv']):
+        os.remove(exportFilename['csv'])
+
 def exportCollatedData(keywordTraffic):
     for key in exportFilename:
         exportFilename[key] = exportPath + exportFilename[key]
 
-    # FOR FUTURE: add a nonce to export file (and any other generated/removed files) 
-    # so that simultaneous requests don't remove each others files.
-    
     if (export_to_json):
-        if path.exists(exportFilename['json']):
-            os.remove(exportFilename['json'])
-
-        with open(exportFilename['json'], 'w') as outfile:
+        with open(exportFilename['json'], 'a') as outfile:
             json.dump(keywordTraffic, outfile)
 
     elif (export_to_csv):
-        if path.exists(exportFilename['csv']):
-            os.remove(exportFilename['csv'])
-
-        with open(exportFilename['csv'], 'w', newline='', encoding='utf-8') as outfile:
+        with open(exportFilename['csv'], 'a', newline='', encoding='utf-8') as outfile:
             csv_writer = csv.writer(outfile)
             headersWritten = False
 
@@ -99,10 +110,25 @@ def exportCollatedData(keywordTraffic):
 def main():
     # Collect data on the desired keywords
     keywordsToSearch = parseKeywordList()
-    autoSearchKeywords(keywordsToSearch)
 
-    # Collate the data into a formatted object
-    cdata = collateData(len(keywordsToSearch))
+    # Remove .json and .csv files from previous searches
+    delete_previous_searches()
+
+    cdata = {}
+
+    # Batch keywords to avoid crashing server on massive data sets
+    while len(keywordsToSearch) > 0:
+        if len(keywordsToSearch) > MAX_TABS:
+            keywordsToSearchSubset = batchSearches(keywordsToSearch, MAX_TABS)
+        else: 
+            keywordsToSearchSubset = batchSearches(keywordsToSearch, len(keywordsToSearch))
+
+        autoSearchKeywords(keywordsToSearchSubset)
+
+
+        # Collate the data into a formatted object
+        cdata.update(collateData(len(keywordsToSearchSubset)))
+
 
     # Save the data to a json/csv file
     exportCollatedData(cdata)

@@ -1,6 +1,6 @@
 import json
 
-data = {'best credit cards':'best credit cards', 'best covid loans':'best covid loans', 'best renovation loans':'best renovation loans'}
+data = {'best credit cards':'best credit cards', 'best covid loans':'best covid loans', 'best renovation loans':'best renovation loans', 'credicard':'credicard', 'mastercard':'mastercard', 'chase credit card':'chase credit card', 'card':'card', 'credit':'credit', 'citibank credit card':'citibank credit card', 'capital one credit card':'capital one credit card', 'best credit cards':'best credit cards', 'credit cards for bad credit':'credit cards for bad credit', 'bank of america credit card':'bank of america credit card', 'visa card':'visa card', 'secured credit card':'secured credit card', 'credit card numbers':'credit card numbers', 'debit card':'debit card', 'compare cards':'compare cards', 'discover credit card':'discover credit card', 'hsbc credit card':'hsbc credit card', 'credit burea':'credit burea', 'credit check':'credit check', 'american express credit card':'american express credit card', 'first premier credit card':'first premier credit card', 'credit card apply':'credit card apply', 'paypal credit card':'paypal credit card', 'shell credit card':'shell credit card'}
 
 with open('keyword_list.json', 'w') as outfile:
     json.dump(data, outfile)
